@@ -7,21 +7,18 @@
 #define LED2 2
 #define LED3 12
 
-const char* ssid = "";
-const char* password = "";
+const char* ssid = "Lingangu";
+const char* password = "14882284";
 
 AsyncWebServer server(80);
 bool running = false;
 bool direction;
 
 unsigned long previousMillis1 = 0;
-unsigned long previousMillis2 = 0;
-unsigned long previousMillis3 = 0;
 unsigned long previousMillisStop1 = 0;
-unsigned long previousMillisStop2 = 0;
-unsigned long previousMillisStop3 = 0;
-
 const long interval = 500;
+
+int currentLed = LED1; // Загальна змінна для обох функцій
 
 void connectToWiFi();
 void setupWebServer();
@@ -96,7 +93,6 @@ void setupWebServer() {
 }
 
 void handleStart(AsyncWebServerRequest *request) {
-    Serial.println("Start pressed!");
     running = true;
     direction = !direction;
     EEPROM.write(0, direction);
@@ -105,7 +101,6 @@ void handleStart(AsyncWebServerRequest *request) {
 }
 
 void handleStop(AsyncWebServerRequest *request) {
-    Serial.println("Stop pressed!");
     running = false;
     stopLeds();
     request->send(200, "text/plain", "Stopped");
@@ -116,7 +111,6 @@ void initializePins() {
     pinMode(LED1, OUTPUT);
     pinMode(LED2, OUTPUT);
     pinMode(LED3, OUTPUT);
-
     stopLeds();
 }
 
@@ -127,8 +121,6 @@ void initializeEEPROM() {
 
 void stopLeds() {
     unsigned long currentMillis = millis();
-    static int currentLed = LED1; 
-
     if (currentMillis - previousMillisStop1 >= interval) {
         previousMillisStop1 = currentMillis;
 
@@ -142,7 +134,7 @@ void stopLeds() {
             currentLed = LED2;
         } else if (currentLed == LED2) {
             currentLed = LED3;
-        } else if (currentLed == LED3) {
+        } else {
             currentLed = LED1;
         }
     }
@@ -150,8 +142,6 @@ void stopLeds() {
 
 void blinkLeds() {
     unsigned long currentMillis = millis();
-    static int currentLed = LED3; 
-
     if (currentMillis - previousMillis1 >= interval) {
         previousMillis1 = currentMillis;
 
@@ -165,7 +155,7 @@ void blinkLeds() {
             currentLed = LED2;
         } else if (currentLed == LED2) {
             currentLed = LED1;
-        } else if (currentLed == LED1) {
+        } else {
             currentLed = LED3;
         }
     }
